@@ -106,10 +106,13 @@ def get_model_full_path(models_path, model_name, experiment_postfix):
     
     return model_full_name
 
-def get_model_fname_pattern(models_path, model_name):
+def get_model_fname_pattern(models_path, model_name, no_validation=False):
     model_full_path = get_model_full_path(
         models_path, model_name, '')
-    filepath = join(model_full_path, '{epoch:02d}_{val_acc:.2f}.h5')
+    if no_validation:
+        filepath = join(model_full_path, '{epoch:02d}_{acc:.2f}.h5')
+    else:
+        filepath = join(model_full_path, '{epoch:02d}_{val_acc:.2f}.h5')
     
     return filepath
 
