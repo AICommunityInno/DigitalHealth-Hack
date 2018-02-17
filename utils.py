@@ -5,6 +5,17 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 import numpy as np
+import pandas as pd
+
+from os.path import join, basename, exists
+from os import makedirs, listdir
+import time
+
+def load_data(path):
+    data = pd.read_csv(path)
+    data['Жалобы (ngramm)'] = data['Жалобы (ngramm)'].fillna('')
+    
+    return data
 
 def get_most_popular_diagnoses(data, percent=.95):
     cumsums = np.cumsum(data.value_counts())
@@ -62,3 +73,39 @@ def preprocess_transform(tfidf_complaints, vect_doctors, pop_doctor, data):
         np.expand_dims(repeats, axis=1),
         np.expand_dims(age, axis=1)
     ])
+
+def get_next_model_id(experiment_dir):
+    if not exists(experiment_dir):
+        makedirs(experiment_dir)
+    
+    experiment_path = join(experiment_dir, '.model_ids.txt')
+    if not exists(experiment_path):
+        with open(experiment_path, 'w'):
+            pass
+        
+    with open(experiment_path, 'r') as model_ids_f:
+        model_ids = list(model_ids_f)
+        model_ids = list(map(lambda str_id: int(str_id), model_ids))
+        
+    next_id = max(model_ids) + 1 if len(model_ids) > 0 else 0
+    
+    with open(experiment_path, 'a') as model_ids_f:
+        model_ids_f.write(str(next_id) + '\n')
+    
+    return next_id
+
+def get_model_full_path(models_path, model_name, experiment_postfix):
+    time_str = '_'.join(time.ctime().split(' '))
+    m_full_name = model_name + '_' + experiment_postfix + '_' + time_str
+    model_full_name = join(models_path, m_full_name)
+    if not exists(model_full_name):
+        makedirs(model_full_name)
+    
+    return model_full_name
+
+def get_model_fname_pattern(models_path, model_name):
+    model_full_path = get_model_full_path(
+        models_path, model_name, '')
+    filepath = join(model_full_path, '{epoch:02d}_{val_acc:.2f}.h5')
+    
+    return filepath
