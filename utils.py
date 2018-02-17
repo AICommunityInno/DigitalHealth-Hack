@@ -12,3 +12,11 @@ def get_most_popular_diagnoses(data, percent=95):
     popular_diagnoses = list(map(lambda idx: num_to_diag[idx], popular_idxs))
     
     return popular_diagnoses
+
+def get_doctor(string):
+    string = string.replace(',', ' ')
+    splitted_str = string.split('врача-')
+    if len(splitted_str) > 1:
+        return splitted_str[1].split(' ')[0]
+    else:
+        return 'нет'
