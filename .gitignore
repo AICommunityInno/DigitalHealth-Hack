@@ -40,4 +40,5 @@ config.rst
 nohup.out
 *.pem
 *.key
+*.log
 
