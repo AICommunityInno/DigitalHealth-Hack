@@ -37,4 +37,5 @@ config.rst
 
 /.project
 /.pydevproject
+nohup.out
 
