@@ -20,6 +20,19 @@ def load_data(path):
     
     return data
 
+def join_topics(data, topics):
+    data = data.copy()
+    
+    topics_df = pd.DataFrame(dict(zip(
+        ['topic' + str(i) for i in range(topics.shape[1])],
+        [topics[:, i] for i in range(topics.shape[1])])))
+    topics_df['Id_Записи'] = data['Id_Записи']
+
+    data = data.join(topics_df, on='Id_Записи', rsuffix='_topics', how='outer')
+    data = data.drop(columns=['Id_Записи_topics'])
+    
+    return data
+
 def get_most_popular_diagnoses(data, percent=.95):
     cumsums = np.cumsum(data.value_counts())
     most_classes = data.value_counts()[cumsums <= percent * len(data)]
